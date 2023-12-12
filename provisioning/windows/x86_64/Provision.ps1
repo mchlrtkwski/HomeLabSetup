@@ -39,6 +39,7 @@ choco install visualstudio2022community
 choco install vscode
 choco install 7zip
 choco install github-desktop
+choco install anaconda3
 
 # Install Windows Subsystem for Linux and Install docker-desktop
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
@@ -68,6 +69,14 @@ Start-Service 'remote desktop services'
 # .\RDPWInst -i
 # This will hel immensely when checking rdp configurations
 # C:\ProgramData\chocolatey\lib\rdpwrapper\tools\RDPConf.exe
+
+# Add the scoop utility downloader
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+iwr -useb get.scoop.sh | iex
+
+# Install Utilites
+scoop bucket add extras
+scoop install helm
 
 
 
