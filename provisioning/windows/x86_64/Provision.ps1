@@ -9,9 +9,11 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 # Install WinGet for Windows 10 feature Installations
 choco install winget
+choco install wget
 
 # Fetch and Install the Latest PowerShell
 winget install Microsoft.PowerShell
+winget install Microsoft.PowerToys
 
 # Fetch and Install the Latest OpenSSH Windows Feature
 # Start the OpenSSH Service and set it to Automatic, 
@@ -19,6 +21,10 @@ winget install "openssh beta"
 netsh advfirewall firewall add rule name="Open SSH Port 22" dir=in action=allow protocol=TCP localport=22 remoteip=any
 Start-Service sshd
 Set-Service -Name sshd -StartupType 'Automatic'
+# Open C:\\ProgramData\ssh\ssh_config
+# Comment final two lines to allow for authorized users (i.e. ssh-copy-id)
+# : #Match Group administrators
+# :#       AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys
 
 # Forget What these Two are for:
 # 1) Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
@@ -54,3 +60,13 @@ choco install rainmeter
 Stop-Service 'remote desktop services'
 choco install rdpwrapper
 Start-Service 'remote desktop services'
+# Additional Effort was required on this part. Additionally that link is subject to Change.
+# wget https://github.com/sebaxakerhtc/rdpwrap.ini/blob/master/rdpwrap.ini
+# cd C:\ProgramData\chocolatey\lib\rdpwrapper\tools 
+# .\RDPWInst -u -k 
+# .\RDPWInst -i
+# This will hel immensely when checking rdp configurations
+# C:\ProgramData\chocolatey\lib\rdpwrapper\tools\RDPConf.exe
+
+
+
