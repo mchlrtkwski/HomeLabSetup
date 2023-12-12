@@ -46,6 +46,7 @@ dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /nores
 choco install docker-desktop
 
 # Game Engines and Tools
+choco install steam
 choco install steamcmd
 choco install epicgameslauncher
 
