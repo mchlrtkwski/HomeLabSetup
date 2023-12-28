@@ -1,0 +1,51 @@
+installation_prefix: /usr/local
+local_prefix: ./local/source
+
+gnu_tools:
+  - name:         "make"
+    version:      "v4.3"
+    description:  "GNU Make"
+    archive_name: "make-{{ item.version }}.tar.gz"
+    url:          "https://ftp.gnu.org/gnu/make/{{ item.archive_name }}"
+    local_archive: "{{ local_prefix }}/{{ item.archive_name }}"
+    requires_configure: false
+
+  - name:         "curl"
+    version:      "7.79.1"
+    description:  "Curl"
+    archive_name: "curl-{{ item.version }}.tar.gz"
+    url:          "https://curl.se/download/{{ item.archive_name}"
+    local_archive: "{{ local_prefix }}/{{ item.archive_name }}"
+    requires_configure: false
+
+  - name:         "perl"
+    version:      "5.34.0"
+    description:  "Perl"
+    archive_name: "perl-{{ item.version }}.tar.gz"
+    url:          "https://www.cpan.org/src/5.0/{{ item.archive_name }}"
+    local_archive: "{{ local_prefix }}/{{ item.archive_name }}"
+    requires_configure: false
+
+  - name:         "git"
+    version:      "v2.42.0"
+    description:  "Git"
+    archive_name: "{{ item.version }}.tar.gz"
+    url:          "https://github.com/git/git/archive/refs/tags/{{ item.archive_name}}"
+    local_archive: "{{ local_prefix }}/{{ item.archive_name }}"
+    requires_configure: false
+  
+  - name:         "zip"
+    version:      "30"
+    description:  "Zip"
+    archive_name: "zip{{ item.version }}.tar.gz"
+    url:          "https://downloads.sourceforge.net/infozip/{{ item.archive_name }}"
+    local_archive: "{{ local_prefix }}/{{ item.archive_name }}"
+    requires_configure: false
+
+  - name:         "IPC-Cmd"
+    version:      "1.04"
+    description:  "IPC-Cmd"
+    archive_name: "IPC-Cmd-{{ item.version }}.tar.gz"
+    url:          "https://cpan.metacpan.org/authors/id/T/TO/TODDR/{{ item.archive_name }}"
+    local_archive: "{{ local_prefix }}/{{ item.archive_name }}"
+    requires_configure: false
