@@ -46,6 +46,6 @@ gnu_tools:
     version:      "1.04"
     description:  "IPC-Cmd"
     archive_name: "IPC-Cmd-{{ item.version }}.tar.gz"
-    url:          "https://cpan.metacpan.org/authors/id/T/TO/TODDR/{{ item.archive_name }}"
+    url:          "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/{{ item.archive_name }}"
     local_archive: "{{ local_prefix }}/{{ item.archive_name }}"
     requires_configure: false
