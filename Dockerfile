@@ -200,6 +200,91 @@ RUN source /root/.bashrc && \
     make install && \
     rm -rf /tmp/build/*
 
+# Download and Install Rust
+RUN echo "export CARGO_HOME=$TOOLCHAIN_ROOT/cargo" >> /root/.bashrc && \
+    mkdir -p $TOOLCHAIN_ROOT/cargo && \
+    source /root/.bashrc && \
+    curl --proto '=https' --tlsv1.2 -sSf -y https://sh.rustup.rs | sh
+
+# Download and Build Ruby
+RUN source /root/.bashrc && \
+    wget https://cache.ruby-lang.org/pub/ruby/3.0/ruby-3.0.2.tar.gz && \
+    tar -xzf ruby-3.0.2.tar.gz && \
+    cd ruby-3.0.2 && \
+    ./configure --prefix=$TOOLCHAIN_ROOT && \
+    make && \
+    make install && \
+    rm -rf /tmp/build/*
+# # Build Golang from source
+# RUN source /root/.bashrc && \
+#     export ARCH=$(uname -m) && \
+#     if [ $ARCH == "x86_64" ]; then \
+#         wget https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz && \
+#         tar -xzf go1.4-bootstrap-20171003.tar.gz && \
+#         cd go/src && \
+#         CGO_ENABLED=0 ./make.bash && \
+#         cd .. && \
+#         cp -r go/* $TOOLCHAIN_ROOT && \
+#         rm -rf /tmp/build/*; \
+#     else \
+#         echo "Unsupported Architecture"; \
+#     fi
+
+# Download and Install libtoolize
+RUN source /root/.bashrc && \
+    wget https://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.gz && \
+    tar -xzf libtool-2.4.6.tar.gz && \
+    cd libtool-2.4.6 && \
+    ./configure --prefix=$TOOLCHAIN_ROOT && \
+    make && \
+    make install && \
+    rm -rf /tmp/build/*
+# Download and Install automake
+RUN source /root/.bashrc && \
+    wget https://ftp.gnu.org/gnu/automake/automake-1.16.4.tar.gz && \
+    tar -xzf automake-1.16.4.tar.gz && \
+    cd automake-1.16.4 && \
+    ./configure --prefix=$TOOLCHAIN_ROOT && \
+    make && \
+    make install && \
+    rm -rf /tmp/build/*
+
+# Download and Install which
+RUN source /root/.bashrc && \
+    wget https://ftp.gnu.org/gnu/which/which-2.21.tar.gz && \
+    tar -xzf which-2.21.tar.gz && \
+    cd which-2.21 && \
+    ./configure --prefix=$TOOLCHAIN_ROOT && \
+    make && \
+    make install && \
+    rm -rf /tmp/build/*
+
+# Download and Install Mono
+RUN source /root/.bashrc && \
+    wget https://github.com/mono/mono/archive/refs/tags/mono-6.12.0.205.tar.gz && \
+    tar -xf mono-6.12.0.205.tar.gz && \
+    cd mono-mono-6.12.0.205 && \
+    ./autogen.sh --prefix=$TOOLCHAIN_ROOT && \
+    make get-monolite-latest && \
+    ./configure --prefix=$TOOLCHAIN_ROOT && \
+    make install && \
+    rm -rf /tmp/build/*
+
+
+# Download Java 8 and Install
+# RUN source /root/.bashrc && \
+#     export ARCH=$(uname -m) && \
+#     export JAVA_ARCH="UNKNOWN"; \
+#     if [ $ARCH == "x86_64" ]; then \
+#         export JAVA_ARCH="x64"; \
+#     elif [ $ARCH == "aarch64" ]; then \
+#         export JAVA_ARCH="aarch64"; \
+#     fi && \
+#     wget https://download.oracle.com/otn/java/jdk/8u391-b13/b291ca3e0c8548b5a51d5a5f50063037/jdk-8u391-linux-${JAVA_ARCH}.tar.gz && \
+#     tar -xzf jdk-8u391-linux-${JAVA_ARCH}.tar.gz && \
+#     mkdir -p $TOOLCHAIN_ROOT/java && \
+#     cp -a jdk1.8.0_391 $TOOLCHAIN_ROOT/java 
+
 WORKDIR /opt/rh/
 
 # Bootstrap or Build VCPKG
