@@ -259,17 +259,54 @@ RUN source /root/.bashrc && \
     make install && \
     rm -rf /tmp/build/*
 
+# Download and Install Monolite
+#RUN source /root/.bashrc && \
+#    wget https://download.mono-project.com/monolite/monolite-linux-1A5E0066-58DC-428A-B21C-0AD6CDAE2789-latest.tar.gz && \
+#    tar -xzf monolite-linux-1A5E0066-58DC-428A-B21C-0AD6CDAE2789-latest.tar.gz && \
+#    cp -r monolite-linux-1A5E0066-58DC-428A-B21C-0AD6CDAE2789-latest/* $TOOLCHAIN_ROOT && \
 # Download and Install Mono
+# RUN source /root/.bashrc && \
+#     # Download Source Release for Initial Bootstrap
+#     wget https://github.com/mono/mono/archive/refs/tags/mono-6.12.0.199.tar.gz && \
+#     tar -xf mono-6.12.0.199.tar.gz && \
+#     cd mono-mono-6.12.0.199 && \
+#     ./autogen.sh --prefix=$TOOLCHAIN_ROOT && \
+#     make get-monolite-latest && \
+#     make install && \
+#     rm -rf /tmp/build/*
+
 RUN source /root/.bashrc && \
-    wget https://github.com/mono/mono/archive/refs/tags/mono-6.12.0.205.tar.gz && \
-    tar -xf mono-6.12.0.205.tar.gz && \
-    cd mono-mono-6.12.0.205 && \
-    ./autogen.sh --prefix=$TOOLCHAIN_ROOT && \
-    make get-monolite-latest && \
+    wget https://download.mono-project.com/sources/mono/mono-6.12.0.199.tar.xz && \
+    tar -xf mono-6.12.0.199.tar.xz && \
+    cd mono-6.12.0.199 && \
+    ./configure --prefix=$TOOLCHAIN_ROOT --with-sgen=yes && \
+    make && \
+    make install && \
+    rm -rf /tmp/build/* && \
+    cert-sync /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+
+# Download and Install Bash
+RUN source /root/.bashrc && \
+    wget https://ftp.gnu.org/gnu/bash/bash-5.1.tar.gz && \
+    tar -xzf bash-5.1.tar.gz && \
+    cd bash-5.1 && \
     ./configure --prefix=$TOOLCHAIN_ROOT && \
+    make && \
     make install && \
     rm -rf /tmp/build/*
 
+RUN source /root/.bashrc && \
+    mkdir -p $TOOLCHAIN_ROOT/local/exe && \
+    cd $TOOLCHAIN_ROOT/local/exe && \
+    wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe && \
+    echo "#!${TOOLCHAIN_ROOT}/bin/bash" >> $TOOLCHAIN_ROOT/bin/nuget && \
+    echo "$TOOLCHAIN_ROOT/bin/mono $TOOLCHAIN_ROOT/local/exe/nuget.exe \${@}" >> $TOOLCHAIN_ROOT/bin/nuget && \
+    chmod +x $TOOLCHAIN_ROOT/bin/nuget
+
+RUN source /root/.bashrc && \
+    echo "#!${TOOLCHAIN_ROOT}/bin/bash" >> $TOOLCHAIN_ROOT/bin/rpm && \
+    echo "" >> $TOOLCHAIN_ROOT/bin/rpm  && \
+    chmod +x $TOOLCHAIN_ROOT/bin/rpm 
 
 # Download Java 8 and Install
 # RUN source /root/.bashrc && \
