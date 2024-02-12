@@ -200,36 +200,6 @@ RUN source /root/.bashrc && \
     make install && \
     rm -rf /tmp/build/*
 
-# Download and Install Rust
-RUN echo "export CARGO_HOME=$TOOLCHAIN_ROOT/cargo" >> /root/.bashrc && \
-    mkdir -p $TOOLCHAIN_ROOT/cargo && \
-    source /root/.bashrc && \
-    curl --proto '=https' --tlsv1.2 -sSf -y https://sh.rustup.rs | sh
-
-# Download and Build Ruby
-RUN source /root/.bashrc && \
-    wget https://cache.ruby-lang.org/pub/ruby/3.0/ruby-3.0.2.tar.gz && \
-    tar -xzf ruby-3.0.2.tar.gz && \
-    cd ruby-3.0.2 && \
-    ./configure --prefix=$TOOLCHAIN_ROOT && \
-    make && \
-    make install && \
-    rm -rf /tmp/build/*
-# # Build Golang from source
-# RUN source /root/.bashrc && \
-#     export ARCH=$(uname -m) && \
-#     if [ $ARCH == "x86_64" ]; then \
-#         wget https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz && \
-#         tar -xzf go1.4-bootstrap-20171003.tar.gz && \
-#         cd go/src && \
-#         CGO_ENABLED=0 ./make.bash && \
-#         cd .. && \
-#         cp -r go/* $TOOLCHAIN_ROOT && \
-#         rm -rf /tmp/build/*; \
-#     else \
-#         echo "Unsupported Architecture"; \
-#     fi
-
 # Download and Install libtoolize
 RUN source /root/.bashrc && \
     wget https://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.gz && \
@@ -239,6 +209,7 @@ RUN source /root/.bashrc && \
     make && \
     make install && \
     rm -rf /tmp/build/*
+    
 # Download and Install automake
 RUN source /root/.bashrc && \
     wget https://ftp.gnu.org/gnu/automake/automake-1.16.4.tar.gz && \
@@ -259,22 +230,7 @@ RUN source /root/.bashrc && \
     make install && \
     rm -rf /tmp/build/*
 
-# Download and Install Monolite
-#RUN source /root/.bashrc && \
-#    wget https://download.mono-project.com/monolite/monolite-linux-1A5E0066-58DC-428A-B21C-0AD6CDAE2789-latest.tar.gz && \
-#    tar -xzf monolite-linux-1A5E0066-58DC-428A-B21C-0AD6CDAE2789-latest.tar.gz && \
-#    cp -r monolite-linux-1A5E0066-58DC-428A-B21C-0AD6CDAE2789-latest/* $TOOLCHAIN_ROOT && \
 # Download and Install Mono
-# RUN source /root/.bashrc && \
-#     # Download Source Release for Initial Bootstrap
-#     wget https://github.com/mono/mono/archive/refs/tags/mono-6.12.0.199.tar.gz && \
-#     tar -xf mono-6.12.0.199.tar.gz && \
-#     cd mono-mono-6.12.0.199 && \
-#     ./autogen.sh --prefix=$TOOLCHAIN_ROOT && \
-#     make get-monolite-latest && \
-#     make install && \
-#     rm -rf /tmp/build/*
-
 RUN source /root/.bashrc && \
     wget https://download.mono-project.com/sources/mono/mono-6.12.0.199.tar.xz && \
     tar -xf mono-6.12.0.199.tar.xz && \
@@ -285,6 +241,15 @@ RUN source /root/.bashrc && \
     rm -rf /tmp/build/* && \
     cert-sync /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
 
+# Download and Install Nuget
+RUN source /root/.bashrc && \
+    mkdir -p $TOOLCHAIN_ROOT/local/exe && \
+    cd $TOOLCHAIN_ROOT/local/exe && \
+    wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe && \
+    echo "#!${TOOLCHAIN_ROOT}/bin/bash" >> $TOOLCHAIN_ROOT/bin/nuget && \
+    echo "$TOOLCHAIN_ROOT/bin/mono $TOOLCHAIN_ROOT/local/exe/nuget.exe \${@}" >> $TOOLCHAIN_ROOT/bin/nuget && \
+    chmod +x $TOOLCHAIN_ROOT/bin/nuget
+
 # Download and Install Bash
 RUN source /root/.bashrc && \
     wget https://ftp.gnu.org/gnu/bash/bash-5.1.tar.gz && \
@@ -294,33 +259,49 @@ RUN source /root/.bashrc && \
     make && \
     make install && \
     rm -rf /tmp/build/*
-
-RUN source /root/.bashrc && \
-    mkdir -p $TOOLCHAIN_ROOT/local/exe && \
-    cd $TOOLCHAIN_ROOT/local/exe && \
-    wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe && \
-    echo "#!${TOOLCHAIN_ROOT}/bin/bash" >> $TOOLCHAIN_ROOT/bin/nuget && \
-    echo "$TOOLCHAIN_ROOT/bin/mono $TOOLCHAIN_ROOT/local/exe/nuget.exe \${@}" >> $TOOLCHAIN_ROOT/bin/nuget && \
-    chmod +x $TOOLCHAIN_ROOT/bin/nuget
-
+    
 RUN source /root/.bashrc && \
     echo "#!${TOOLCHAIN_ROOT}/bin/bash" >> $TOOLCHAIN_ROOT/bin/rpm && \
     echo "" >> $TOOLCHAIN_ROOT/bin/rpm  && \
     chmod +x $TOOLCHAIN_ROOT/bin/rpm 
 
-# Download Java 8 and Install
+RUN source /root/.bashrc && \
+    export ARCH=$(uname -m) && \
+    export GO_ARCH="UNKNOWN"; \
+    export ARCH=$(uname -m) && \
+    if [ $ARCH == "x86_64" ]; then \
+        export GO_ARCH="amd64"; \
+    elif [ $ARCH == "aarch64" ]; then \
+        export GO_ARCH="arm64"; \
+    fi && \
+    wget https://go.dev/dl/go1.21.6.linux-${GO_ARCH}.tar.gz && \
+    tar -xzf go1.21.6.linux-${GO_ARCH}.tar.gz && \
+    cp -r go/* $TOOLCHAIN_ROOT && \
+    rm -rf /tmp/build/*
+
+# # Download Java 8 and Install
+# # https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html
+# # Older Releases are Blocked by login
+# # The java layer is duped without a web server to pull from, this can be multistaged later
+# COPY ./java ./java
 # RUN source /root/.bashrc && \
 #     export ARCH=$(uname -m) && \
 #     export JAVA_ARCH="UNKNOWN"; \
+#     export JAVA_ID=""; \
+#     export JAVA_RELEASE_DATE=""; \
 #     if [ $ARCH == "x86_64" ]; then \
 #         export JAVA_ARCH="x64"; \
 #     elif [ $ARCH == "aarch64" ]; then \
 #         export JAVA_ARCH="aarch64"; \
+#         export JAVA_ID="-fcs-bin-b13"; \
+#         export JAVA_RELEASE_DATE="-04_oct_2023"; \
 #     fi && \
-#     wget https://download.oracle.com/otn/java/jdk/8u391-b13/b291ca3e0c8548b5a51d5a5f50063037/jdk-8u391-linux-${JAVA_ARCH}.tar.gz && \
-#     tar -xzf jdk-8u391-linux-${JAVA_ARCH}.tar.gz && \
 #     mkdir -p $TOOLCHAIN_ROOT/java && \
-#     cp -a jdk1.8.0_391 $TOOLCHAIN_ROOT/java 
+#     cd java && \
+#     tar -xf jdk-8u391${JAVA_ID}-linux-${JAVA_ARCH}${JAVA_RELEASE_DATE}.tar && \
+#     mkdir -p $TOOLCHAIN_ROOT/java && \
+#     cp -a jdk1.8.0_391 $TOOLCHAIN_ROOT/java/ && \
+#     rm -rf /tmp/build/*
 
 WORKDIR /opt/rh/
 
