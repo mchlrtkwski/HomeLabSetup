@@ -259,12 +259,14 @@ RUN source /root/.bashrc && \
     make && \
     make install && \
     rm -rf /tmp/build/*
-    
+
+# Nerf the rpm binary
 RUN source /root/.bashrc && \
     echo "#!${TOOLCHAIN_ROOT}/bin/bash" >> $TOOLCHAIN_ROOT/bin/rpm && \
     echo "" >> $TOOLCHAIN_ROOT/bin/rpm  && \
     chmod +x $TOOLCHAIN_ROOT/bin/rpm 
-
+    
+# Install Golang
 RUN source /root/.bashrc && \
     export ARCH=$(uname -m) && \
     export GO_ARCH="UNKNOWN"; \
@@ -278,7 +280,22 @@ RUN source /root/.bashrc && \
     tar -xzf go1.21.6.linux-${GO_ARCH}.tar.gz && \
     cp -r go/* $TOOLCHAIN_ROOT && \
     rm -rf /tmp/build/*
+    
+# Download and Install Rust
+RUN echo "export CARGO_HOME=$TOOLCHAIN_ROOT/cargo" >> /root/.bashrc && \
+    mkdir -p $TOOLCHAIN_ROOT/cargo && \
+    source /root/.bashrc && \
+    curl --proto '=https' --tlsv1.2 -sSf -y https://sh.rustup.rs | sh
 
+# Download and Build Ruby
+RUN source /root/.bashrc && \
+    wget https://cache.ruby-lang.org/pub/ruby/3.0/ruby-3.0.2.tar.gz && \
+    tar -xzf ruby-3.0.2.tar.gz && \
+    cd ruby-3.0.2 && \
+    ./configure --prefix=$TOOLCHAIN_ROOT && \
+    make && \
+    make install && \
+    rm -rf /tmp/build/*
 # # Download Java 8 and Install
 # # https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html
 # # Older Releases are Blocked by login
